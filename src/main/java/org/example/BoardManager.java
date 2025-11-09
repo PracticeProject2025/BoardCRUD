@@ -57,15 +57,15 @@ public class BoardManager {
                 case 4:
                     boardCRUD.deleteItem();
                     break;
-                case 5:
-                    boardCRUD.searchTitle();
-                    break;
-                case 6:
-                    boardCRUD.searchAuthor();
-                    break;
-                case 7:
-                    boardCRUD.viewRanking();
-                    break;
+//                case 5:
+//                    boardCRUD.searchTitle();
+//                    break;
+//                case 6:
+//                    boardCRUD.searchAuthor();
+//                    break;
+//                case 7:
+//                    boardCRUD.viewRanking();
+//                    break;
                 default:
                     System.out.println("잘못된 메뉴입니다. 0-7 사이의 숫자를 입력하세요.");
             }
