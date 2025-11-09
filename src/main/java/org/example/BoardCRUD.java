@@ -57,26 +57,33 @@ public class BoardCRUD implements IBoardCRUD {
     @Override
     public void listAll() {
         System.out.println("---------------------------------");
-        System.out.printf("%-3s %-25s %-10s %-12s %s\n", "No", "Subject", "Writer", "Date", "Read");
+        System.out.printf("%-3s %-25s %-10s %-12s %-5s\n", "No", "Subject", "Writer", "Date", "Read");
         System.out.println("---------------------------------");
 
-        String sql = "SELECT id, subject, writer, created_date, read FROM board ORDER BY id DESC";
+        String sql = "SELECT id, subject, writer, created_date, read FROM board ORDER BY id ASC";
 
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
+            int count = 1;
             while (rs.next()) {
                 String dateStr = rs.getString("created_date");
                 String displayDate = (dateStr != null && dateStr.length() >= 10)
                         ? dateStr.substring(0, 10)
-                        : dateStr;
+                        : (dateStr == null ? "" : dateStr);
 
-                System.out.printf("%-3d %-25s %-10s %-12s %d\n",
-                        rs.getInt("id"),
-                        rs.getString("subject"),
+                String subjectStr = rs.getString("subject");
+                String displaySubject = (subjectStr != null && subjectStr.length() > 20)
+                        ? subjectStr.substring(0, 20) + "..."
+                        : (subjectStr == null ? "" : subjectStr);
+
+                System.out.printf("%-3d %-25s %-10s %-12s %-5d\n",
+                        count,
+                        displaySubject, // 잘린 제목 사용
                         rs.getString("writer"),
                         displayDate,
                         rs.getInt("read"));
+                count++;
             }
         } catch (SQLException e) {
             System.err.println("데이터 조회 오류: " + e.getMessage());
@@ -146,28 +153,35 @@ public class BoardCRUD implements IBoardCRUD {
         System.out.print("=> 검색할 제목 키워드: ");
         String keyword = s.nextLine().trim();
 
-        String sql = "SELECT id, subject, writer, created_date, read FROM board WHERE subject LIKE ?";
+        String sql = "SELECT id, subject, writer, created_date, read FROM board WHERE subject LIKE ? ORDER BY id ASC";
 
         System.out.println("---------------------------------");
-        System.out.printf("%-3s %-25s %-10s %-12s %s\n", "No", "Subject", "Writer", "Date", "Read");
+        System.out.printf("%-3s %-25s %-10s %-12s %-5s\n", "No", "Subject", "Writer", "Date", "Read");
         System.out.println("---------------------------------");
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, "%" + keyword + "%");
             ResultSet rs = pstmt.executeQuery();
 
+            int count = 1;
             while (rs.next()) {
                 String dateStr = rs.getString("created_date");
                 String displayDate = (dateStr != null && dateStr.length() >= 10)
                         ? dateStr.substring(0, 10)
-                        : dateStr;
+                        : (dateStr == null ? "" : dateStr);
 
-                System.out.printf("%-3d %-25s %-10s %-12s %d\n",
-                        rs.getInt("id"),
-                        rs.getString("subject"),
+                String subjectStr = rs.getString("subject");
+                String displaySubject = (subjectStr != null && subjectStr.length() > 20)
+                        ? subjectStr.substring(0, 20) + "..."
+                        : (subjectStr == null ? "" : subjectStr);
+
+                System.out.printf("%-3d %-25s %-10s %-12s %-5d\n",
+                        count,
+                        displaySubject, // 잘린 제목 사용
                         rs.getString("writer"),
                         displayDate,
                         rs.getInt("read"));
+                count++;
             }
             rs.close();
         } catch (SQLException e) {
@@ -182,28 +196,35 @@ public class BoardCRUD implements IBoardCRUD {
         System.out.print("=> 검색할 작성자명: ");
         String author = s.nextLine().trim();
 
-        String sql = "SELECT id, subject, writer, created_date, read FROM board WHERE writer LIKE ?";
+        String sql = "SELECT id, subject, writer, created_date, read FROM board WHERE writer LIKE ? ORDER BY id ASC";
 
         System.out.println("---------------------------------");
-        System.out.printf("%-3s %-25s %-10s %-12s %s\n", "No", "Subject", "Writer", "Date", "Read");
+        System.out.printf("%-3s %-25s %-10s %-12s %-5s\n", "No", "Subject", "Writer", "Date", "Read");
         System.out.println("---------------------------------");
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, "%" + author + "%");
             ResultSet rs = pstmt.executeQuery();
 
+            int count = 1;
             while (rs.next()) {
                 String dateStr = rs.getString("created_date");
                 String displayDate = (dateStr != null && dateStr.length() >= 10)
                         ? dateStr.substring(0, 10)
-                        : dateStr;
+                        : (dateStr == null ? "" : dateStr);
 
-                System.out.printf("%-3d %-25s %-10s %-12s %d\n",
-                        rs.getInt("id"),
-                        rs.getString("subject"),
+                String subjectStr = rs.getString("subject");
+                String displaySubject = (subjectStr != null && subjectStr.length() > 20)
+                        ? subjectStr.substring(0, 20) + "..."
+                        : (subjectStr == null ? "" : subjectStr);
+
+                System.out.printf("%-3d %-25s %-10s %-12s %-5d\n",
+                        count,
+                        displaySubject,
                         rs.getString("writer"),
                         displayDate,
                         rs.getInt("read"));
+                count++;
             }
             rs.close();
         } catch (SQLException e) {
@@ -215,7 +236,7 @@ public class BoardCRUD implements IBoardCRUD {
     @Override
     public void viewRanking() {
         System.out.println("---------- 조회수 Top 3 ----------");
-        System.out.printf("%-3s %-25s %-10s %s\n", "No", "Subject", "Writer", "Read");
+        System.out.printf("%-3s %-25s %-10s %-5s\n", "No", "Subject", "Writer", "Read");
         System.out.println("---------------------------------");
 
         String sql = "SELECT id, subject, writer, read FROM board ORDER BY read DESC LIMIT 3";
@@ -223,12 +244,20 @@ public class BoardCRUD implements IBoardCRUD {
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
+            int count = 1;
             while (rs.next()) {
-                System.out.printf("%-3d %-25s %-10s %d\n",
-                        rs.getInt("id"),
-                        rs.getString("subject"),
+
+                String subjectStr = rs.getString("subject");
+                String displaySubject = (subjectStr != null && subjectStr.length() > 20)
+                        ? subjectStr.substring(0, 20) + "..."
+                        : (subjectStr == null ? "" : subjectStr);
+
+                System.out.printf("%-3d %-25s %-10s %-5d\n",
+                        count,
+                        displaySubject,
                         rs.getString("writer"),
                         rs.getInt("read"));
+                count++;
             }
         } catch (SQLException e) {
             System.err.println("랭킹 조회 오류: " + e.getMessage());
