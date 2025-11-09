@@ -63,4 +63,15 @@ public class BoardItem {
                 ? this.subject.substring(0, 20) + "..."
                 : (this.subject == null ? "" : this.subject);
     }
+
+    public String toFileString() {
+        return String.join("|",
+                String.valueOf(this.id),
+                this.subject,
+                this.writer,
+                this.created_date,
+                this.updated_date,
+                String.valueOf(this.read)
+        );
+    }
 }

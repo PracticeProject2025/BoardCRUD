@@ -1,6 +1,11 @@
 package org.example;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 public class BoardCRUD implements IBoardCRUD {
@@ -232,6 +237,43 @@ public class BoardCRUD implements IBoardCRUD {
             System.err.println("랭킹 조회 오류: " + e.getMessage());
         }
         System.out.println("------------------------------------------------------------------");
+    }
+
+    @Override
+    public void saveFile() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
+        String fileName = "data_" + sdf.format(new Date()) + ".txt";
+
+        try (PrintWriter pw = new PrintWriter(new FileWriter(fileName))) {
+
+            String sql = "SELECT * FROM board ORDER BY id ASC";
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            pw.println("id|subject|writer|created_date|updated_date|read");
+
+            while (rs.next()) {
+                BoardItem item = new BoardItem(
+                        rs.getInt("id"),
+                        rs.getString("subject"),
+                        rs.getString("writer"),
+                        rs.getString("created_date"),
+                        rs.getString("updated_date"),
+                        rs.getInt("read")
+                );
+                pw.println(item.toFileString());
+            }
+
+            rs.close();
+            stmt.close();
+
+            System.out.println("<<<<< 데이터 저장 완료 (" + fileName + ") >>>>>");
+
+        } catch (IOException e) {
+            System.err.println("파일 쓰기 오류: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("DB 조회 오류 (파일 저장 중): " + e.getMessage());
+        }
     }
 
     public void closeConnection() {

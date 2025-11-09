@@ -21,6 +21,7 @@ public class BoardManager {
                         + "5. 제목으로 검색\n"
                         + "6. 작성자명으로 검색\n"
                         + "7. 조회수 랭킹 (Top 3)\n"
+                        + "8. 파일 저장\n"
                         + "0. 종료\n"
                         + "************************\n"
                         + "=> 원하는 메뉴는? ");
@@ -29,8 +30,8 @@ public class BoardManager {
         try {
             menu = s.nextInt();
         } catch (Exception e) {
-            s.nextLine(); // 잘못된 입력 비우기
-            return -1; // 잘못된 메뉴 선택
+            s.nextLine();
+            return -1;
         }
         return menu;
     }
@@ -66,10 +67,13 @@ public class BoardManager {
                 case 7:
                     boardCRUD.viewRanking();
                     break;
+                case 8:
+                    boardCRUD.saveFile();
+                    break;
                 default:
-                    System.out.println("잘못된 메뉴입니다. 0-7 사이의 숫자를 입력하세요.");
+                    System.out.println("잘못된 메뉴입니다. 0-8 사이의 숫자를 입력하세요.");
             }
-            System.out.println(); // 메뉴 간 구분을 위한 공백
+            System.out.println();
         }
         s.close();
     }

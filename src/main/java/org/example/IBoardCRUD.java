@@ -8,4 +8,5 @@ public interface IBoardCRUD {
     public void searchTitle();
     public void searchAuthor();
     public void viewRanking();
+    public void saveFile();
 }
