@@ -136,4 +136,15 @@ public class BoardCRUD implements IBoardCRUD {
         }
     }
 
+    public void closeConnection() {
+        try {
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
+                System.out.println("DB 연결을 종료합니다.");
+            }
+        } catch (SQLException e) {
+            System.err.println("DB 연결 종료 오류: " + e.getMessage());
+        }
+    }
+
 }
