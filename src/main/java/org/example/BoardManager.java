@@ -49,28 +49,25 @@ public class BoardManager {
                     boardCRUD.listAll();
                     break;
                 case 2:
-                    boardCRUD.viewItem();
-                    break;
-                case 3:
                     boardCRUD.addItem();
                     break;
-                case 4:
+                case 3:
                     boardCRUD.updateItem();
                     break;
-                case 5:
+                case 4:
                     boardCRUD.deleteItem();
                     break;
-                case 6:
+                case 5:
                     boardCRUD.searchTitle();
                     break;
-                case 7:
+                case 6:
                     boardCRUD.searchAuthor();
                     break;
-                case 8:
+                case 7:
                     boardCRUD.viewRanking();
                     break;
                 default:
-                    System.out.println("잘못된 메뉴입니다. 0-8 사이의 숫자를 입력하세요.");
+                    System.out.println("잘못된 메뉴입니다. 0-7 사이의 숫자를 입력하세요.");
             }
             System.out.println(); // 메뉴 간 구분을 위한 공백
         }
