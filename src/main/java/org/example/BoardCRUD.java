@@ -12,12 +12,11 @@ public class BoardCRUD implements IBoardCRUD {
         this.s = s;
         try {
             this.conn = DriverManager.getConnection("jdbc:sqlite:board.db");
-            // 테이블이 없다면 생성
             Statement stmt = conn.createStatement();
             String sql = "CREATE TABLE IF NOT EXISTS board (\n"
                     + "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
                     + "    subject TEXT NOT NULL,\n"
-                    + "    writer TEXT NOT NULL,\n"
+                    + "    writer TEXT,\n"
                     + "    created_date TEXT DEFAULT (DATETIME('now', 'localtime')),\n"
                     + "    updated_date TEXT DEFAULT (DATETIME('now', 'localtime')),\n"
                     + "    read INTEGER DEFAULT 0\n"
@@ -67,12 +66,17 @@ public class BoardCRUD implements IBoardCRUD {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
+                String dateStr = rs.getString("created_date");
+                String displayDate = (dateStr != null && dateStr.length() >= 10)
+                        ? dateStr.substring(0, 10)
+                        : dateStr;
+
                 System.out.printf("%-3d %-25s %-10s %-12s %d\n",
                         rs.getInt("id"),
-                        rs.getString("subject"), // "subject"
-                        rs.getString("writer"), // "writer"
-                        rs.getString("created_date").substring(0, 10),
-                        rs.getInt("read")); // "read"
+                        rs.getString("subject"),
+                        rs.getString("writer"),
+                        displayDate,
+                        rs.getInt("read"));
             }
         } catch (SQLException e) {
             System.err.println("데이터 조회 오류: " + e.getMessage());
@@ -136,6 +140,102 @@ public class BoardCRUD implements IBoardCRUD {
         }
     }
 
+    @Override
+    public void searchTitle() {
+        s.nextLine();
+        System.out.print("=> 검색할 제목 키워드: ");
+        String keyword = s.nextLine().trim();
+
+        String sql = "SELECT id, subject, writer, created_date, read FROM board WHERE subject LIKE ?";
+
+        System.out.println("---------------------------------");
+        System.out.printf("%-3s %-25s %-10s %-12s %s\n", "No", "Subject", "Writer", "Date", "Read");
+        System.out.println("---------------------------------");
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, "%" + keyword + "%");
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                String dateStr = rs.getString("created_date");
+                String displayDate = (dateStr != null && dateStr.length() >= 10)
+                        ? dateStr.substring(0, 10)
+                        : dateStr;
+
+                System.out.printf("%-3d %-25s %-10s %-12s %d\n",
+                        rs.getInt("id"),
+                        rs.getString("subject"),
+                        rs.getString("writer"),
+                        displayDate,
+                        rs.getInt("read"));
+            }
+            rs.close();
+        } catch (SQLException e) {
+            System.err.println("제목 검색 오류: " + e.getMessage());
+        }
+        System.out.println("---------------------------------");
+    }
+
+    @Override
+    public void searchAuthor() {
+        s.nextLine();
+        System.out.print("=> 검색할 작성자명: ");
+        String author = s.nextLine().trim();
+
+        String sql = "SELECT id, subject, writer, created_date, read FROM board WHERE writer LIKE ?";
+
+        System.out.println("---------------------------------");
+        System.out.printf("%-3s %-25s %-10s %-12s %s\n", "No", "Subject", "Writer", "Date", "Read");
+        System.out.println("---------------------------------");
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, "%" + author + "%");
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                String dateStr = rs.getString("created_date");
+                String displayDate = (dateStr != null && dateStr.length() >= 10)
+                        ? dateStr.substring(0, 10)
+                        : dateStr;
+
+                System.out.printf("%-3d %-25s %-10s %-12s %d\n",
+                        rs.getInt("id"),
+                        rs.getString("subject"),
+                        rs.getString("writer"),
+                        displayDate,
+                        rs.getInt("read"));
+            }
+            rs.close();
+        } catch (SQLException e) {
+            System.err.println("작성자 검색 오류: " + e.getMessage());
+        }
+        System.out.println("---------------------------------");
+    }
+
+    @Override
+    public void viewRanking() {
+        System.out.println("---------- 조회수 Top 3 ----------");
+        System.out.printf("%-3s %-25s %-10s %s\n", "No", "Subject", "Writer", "Read");
+        System.out.println("---------------------------------");
+
+        String sql = "SELECT id, subject, writer, read FROM board ORDER BY read DESC LIMIT 3";
+
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                System.out.printf("%-3d %-25s %-10s %d\n",
+                        rs.getInt("id"),
+                        rs.getString("subject"),
+                        rs.getString("writer"),
+                        rs.getInt("read"));
+            }
+        } catch (SQLException e) {
+            System.err.println("랭킹 조회 오류: " + e.getMessage());
+        }
+        System.out.println("---------------------------------");
+    }
+
     public void closeConnection() {
         try {
             if (conn != null && !conn.isClosed()) {
@@ -146,5 +246,4 @@ public class BoardCRUD implements IBoardCRUD {
             System.err.println("DB 연결 종료 오류: " + e.getMessage());
         }
     }
-
 }
