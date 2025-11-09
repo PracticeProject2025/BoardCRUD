@@ -110,4 +110,29 @@ public class BoardCRUD implements IBoardCRUD {
         }
     }
 
+    @Override
+    public void deleteItem() {
+        System.out.print("=> 삭제할 ID: ");
+        int id = s.nextInt();
+        s.nextLine();
+
+        System.out.print("=> 정말로 삭제하시겠습니까? (Y/n) ");
+        String answer = s.next();
+        if (answer.equalsIgnoreCase("Y")) {
+            String sql = "DELETE FROM board WHERE id = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, id);
+                int count = pstmt.executeUpdate();
+                if (count > 0) {
+                    System.out.println("게시글이 삭제되었습니다.");
+                } else {
+                    System.out.println("해당 ID의 게시글이 없습니다.");
+                }
+            } catch (SQLException e) {
+                System.err.println("데이터 삭제 오류: " + e.getMessage());
+            }
+        } else {
+            System.out.println("삭제가 취소되었습니다.");
+        }
+    }
 }
