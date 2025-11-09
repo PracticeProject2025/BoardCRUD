@@ -17,51 +17,50 @@ public class BoardItem {
         this.read = read;
     }
 
-    public int getId() {
-        return id;
+    public int getId() { return id; }
+    public String getSubject() { return subject; }
+    public String getWriter() { return writer; }
+    public int getRead() { return read; }
+
+
+    public static String getDisplayHeader() {
+        return String.format("%-4s %-25s %-10s %-12s %-5s", "ID", "Subject", "Writer", "Date", "Read");
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public String toDisplayString() {
+        String displayDate = (this.created_date != null && this.created_date.length() >= 10)
+                ? this.created_date.substring(0, 10)
+                : (this.created_date == null ? "" : this.created_date);
+
+        String displaySubject = getDisplaySubject();
+
+        return String.format("%-4d %-25s %-10s %-12s %-5d",
+                this.id,
+                displaySubject,
+                this.writer,
+                displayDate,
+                this.read
+        );
     }
 
-    public String getSubject() {
-        return subject;
+    public static String getRankingHeader() {
+        return String.format("%-4s %-25s %-10s %-5s", "ID", "Subject", "Writer", "Read");
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
+    public String toRankingString() {
+        String displaySubject = getDisplaySubject();
+
+        return String.format("%-4d %-25s %-10s %-5d",
+                this.id,
+                displaySubject,
+                this.writer,
+                this.read
+        );
     }
 
-    public String getWriter() {
-        return writer;
-    }
-
-    public void setWriter(String writer) {
-        this.writer = writer;
-    }
-
-    public String getCreated_date() {
-        return created_date;
-    }
-
-    public void setCreated_date(String created_date) {
-        this.created_date = created_date;
-    }
-
-    public String getUpdated_date() {
-        return updated_date;
-    }
-
-    public void setUpdated_date(String updated_date) {
-        this.updated_date = updated_date;
-    }
-
-    public int getRead() {
-        return read;
-    }
-
-    public void setRead(int read) {
-        this.read = read;
+    private String getDisplaySubject() {
+        return (this.subject != null && this.subject.length() > 20)
+                ? this.subject.substring(0, 20) + "..."
+                : (this.subject == null ? "" : this.subject);
     }
 }
