@@ -80,5 +80,34 @@ public class BoardCRUD implements IBoardCRUD {
         System.out.println("---------------------------------");
     }
 
+    @Override
+    public void updateItem() {
+        System.out.print("=> 수정할 ID: ");
+        int id = s.nextInt();
+        s.nextLine();
+
+        System.out.print("=> 새 제목 : ");
+        String subject = s.nextLine().trim();
+
+        if (subject.isEmpty()) {
+            System.out.println("제목은 비워둘 수 없습니다. 수정 취소.");
+            return;
+        }
+
+        String sql = "UPDATE board SET subject = ?, updated_date = DATETIME('now', 'localtime') WHERE id = ?";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, subject);
+            pstmt.setInt(2, id);
+            int count = pstmt.executeUpdate();
+            if (count > 0) {
+                System.out.println("게시글이 수정되었습니다.");
+            } else {
+                System.out.println("해당 ID의 게시글이 없습니다.");
+            }
+        } catch (SQLException e) {
+            System.err.println("데이터 수정 오류: " + e.getMessage());
+        }
+    }
 
 }
