@@ -54,4 +54,31 @@ public class BoardCRUD implements IBoardCRUD {
             System.err.println("데이터 추가 오류: " + e.getMessage());
         }
     }
+
+    @Override
+    public void listAll() {
+        System.out.println("---------------------------------");
+        System.out.printf("%-3s %-25s %-10s %-12s %s\n", "No", "Subject", "Writer", "Date", "Read");
+        System.out.println("---------------------------------");
+
+        String sql = "SELECT id, subject, writer, created_date, read FROM board ORDER BY id DESC";
+
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                System.out.printf("%-3d %-25s %-10s %-12s %d\n",
+                        rs.getInt("id"),
+                        rs.getString("subject"), // "subject"
+                        rs.getString("writer"), // "writer"
+                        rs.getString("created_date").substring(0, 10),
+                        rs.getInt("read")); // "read"
+            }
+        } catch (SQLException e) {
+            System.err.println("데이터 조회 오류: " + e.getMessage());
+        }
+        System.out.println("---------------------------------");
+    }
+
+
 }
