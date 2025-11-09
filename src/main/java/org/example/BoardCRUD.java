@@ -28,4 +28,30 @@ public class BoardCRUD implements IBoardCRUD {
             System.err.println("DB 연결 또는 테이블 생성 실패: " + e.getMessage());
         }
     }
+
+    @Override
+    public void addItem() {
+        s.nextLine();
+        System.out.print("=> subject : ");
+        String subject = s.nextLine().trim();
+        System.out.print("=> writer : ");
+        String writer = s.nextLine().trim();
+
+        if(subject.isEmpty() || writer.isEmpty()) {
+            System.out.println("제목과 작성자는 필수 입력 항목입니다.");
+            return;
+        }
+
+        String sql = "INSERT INTO board (subject, writer, created_date, updated_date, read) "
+                + "VALUES (?, ?, DATETIME('now', 'localtime'), DATETIME('now', 'localtime'), 0)";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, subject);
+            pstmt.setString(2, writer);
+            pstmt.executeUpdate();
+            System.out.println("새 게시글이 추가되었습니다.");
+        } catch (SQLException e) {
+            System.err.println("데이터 추가 오류: " + e.getMessage());
+        }
+    }
 }
